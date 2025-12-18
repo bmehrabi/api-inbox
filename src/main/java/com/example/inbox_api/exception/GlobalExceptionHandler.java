@@ -26,4 +26,13 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(MessageNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleMessageNotFound(MessageNotFoundException ex) {
+        Map<String, String> error = Map.of(
+                "error", "Not Found",
+                "message", ex.getMessage()
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 }

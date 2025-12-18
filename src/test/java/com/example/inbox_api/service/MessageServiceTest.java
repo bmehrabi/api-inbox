@@ -2,7 +2,9 @@ package com.example.inbox_api.service;
 
 import com.example.inbox_api.dto.MessageRequestDTO;
 import com.example.inbox_api.dto.MessageResponseDTO;
+import com.example.inbox_api.dto.MessageResponseDetailsDTO;
 import com.example.inbox_api.entity.Message;
+import com.example.inbox_api.exception.MessageNotFoundException;
 import com.example.inbox_api.repository.MessageRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -62,6 +66,31 @@ public class MessageServiceTest {
         ArgumentCaptor<Message> captor = ArgumentCaptor.forClass(Message.class);
         verify(repository).save(captor.capture());
         assertThat(captor.getValue().getSubject()).isEqualTo("Valid subject");
+    }
+
+    @Test
+    void findById_shouldReturnMessage_whenExists() {
+        // Given
+        Message message = new Message(1L, "Subject", "Text", LocalDateTime.now(), false);
+        when(repository.findById(1L)).thenReturn(Optional.of(message));
+
+        // When
+        MessageResponseDetailsDTO response = service.findById(1L);
+
+        // Then
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getSubject()).isEqualTo("Subject");
+        assertThat(response.getText()).isEqualTo("Text");
+    }
+
+
+    @Test
+    void findById_shouldThrowMessageNotFound_whenNotExists() {
+        // Given
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(MessageNotFoundException.class, () -> service.findById(999L));
     }
 
 }

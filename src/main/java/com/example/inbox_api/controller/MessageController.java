@@ -2,6 +2,7 @@ package com.example.inbox_api.controller;
 
 import com.example.inbox_api.dto.MessageRequestDTO;
 import com.example.inbox_api.dto.MessageResponseDTO;
+import com.example.inbox_api.dto.MessageResponseDetailsDTO;
 import com.example.inbox_api.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,5 +35,11 @@ public class MessageController {
     @Operation(summary = "Create a message")
     public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody MessageRequestDTO dto) {
         return ResponseEntity.ok(service.create(dto));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get message by ID")
+    public ResponseEntity<MessageResponseDetailsDTO> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
     }
 }

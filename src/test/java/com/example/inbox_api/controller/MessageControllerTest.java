@@ -2,6 +2,8 @@ package com.example.inbox_api.controller;
 
 import com.example.inbox_api.dto.MessageRequestDTO;
 import com.example.inbox_api.dto.MessageResponseDTO;
+import com.example.inbox_api.dto.MessageResponseDetailsDTO;
+import com.example.inbox_api.exception.MessageNotFoundException;
 import com.example.inbox_api.service.MessageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -78,5 +80,36 @@ public class MessageControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.subject").value("Subject must be at most 40 characters"));
+    }
+
+    @Test
+    void details_shouldReturnMessage_whenIdExists() throws Exception {
+        // Given
+        MessageResponseDetailsDTO response = new MessageResponseDetailsDTO(
+                1L,
+                "Subject",
+                "Text",
+                LocalDateTime.now()
+        );
+        when(messageService.findById(1L)).thenReturn(response);
+
+        // When & Then
+        mockMvc.perform(get("/api/messages/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.subject").value("Subject"))
+                .andExpect(jsonPath("$.text").value("Text"));
+    }
+
+    @Test
+    void details_shouldReturnNotFound_whenIdDoesNotExist() throws Exception {
+        // Given
+        when(messageService.findById(999L)).thenThrow(new MessageNotFoundException(999L));
+
+        // When & Then
+        mockMvc.perform(get("/api/messages/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Message with id 999 not found"));
     }
 }
