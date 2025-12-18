@@ -19,7 +19,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -91,6 +93,32 @@ public class MessageServiceTest {
 
         // When & Then
         assertThrows(MessageNotFoundException.class, () -> service.findById(999L));
+    }
+
+    @Test
+    void delete_shouldRemoveMessage_whenIdExists() {
+        // Given
+        Message message = new Message(1L, "Subject", "Text", LocalDateTime.now(), false);
+        when(repository.findById(1L)).thenReturn(Optional.of(message));
+        doNothing().when(repository).delete(message);
+
+        // When
+        service.delete(1L);
+
+        // Then
+        verify(repository).findById(1L);
+        verify(repository).delete(message);
+    }
+
+    @Test
+    void delete_shouldThrowMessageNotFound_whenIdDoesNotExist() {
+        // Given
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(MessageNotFoundException.class, () -> service.delete(999L));
+
+        verify(repository, never()).delete(any());
     }
 
 }

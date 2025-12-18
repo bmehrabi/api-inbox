@@ -35,6 +35,13 @@ public class MessageService {
         return toDetailsDTO(message);
     }
 
+    public void delete(Long id) {
+        Message message = repository.findById(id)
+                .orElseThrow(() -> new MessageNotFoundException(id));
+
+        repository.delete(message);
+    }
+
     private MessageResponseDTO map(Message message) {
         return new MessageResponseDTO(
                 message.getId(),

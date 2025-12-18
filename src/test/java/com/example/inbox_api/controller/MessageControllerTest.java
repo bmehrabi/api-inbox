@@ -17,7 +17,11 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -111,5 +115,31 @@ public class MessageControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("Message with id 999 not found"));
+    }
+
+    @Test
+    void delete_shouldReturnNoContent_whenIdExists() throws Exception {
+        // Given
+        doNothing().when(messageService).delete(1L);
+
+        // When & Then
+        mockMvc.perform(delete("/api/messages/1"))
+                .andExpect(status().isNoContent());
+
+        verify(messageService).delete(1L);
+    }
+
+    @Test
+    void delete_shouldReturnNotFound_whenIdDoesNotExist() throws Exception {
+        // Given
+        doThrow(new MessageNotFoundException(999L)).when(messageService).delete(999L);
+
+        // When & Then
+        mockMvc.perform(delete("/api/messages/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Message with id 999 not found"));
+
+        verify(messageService).delete(999L);
     }
 }
