@@ -58,7 +58,6 @@ public class MessageServiceTest {
         // Then
         assertThat(response.getId()).isEqualTo(1L);
         assertThat(response.getSubject()).isEqualTo("Valid subject");
-        assertThat(response.getText()).isEqualTo("Some text");
 
         ArgumentCaptor<Message> captor = ArgumentCaptor.forClass(Message.class);
         verify(repository).save(captor.capture());

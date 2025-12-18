@@ -34,8 +34,8 @@ public class MessageControllerTest {
 
     @Test
     void findAll_shouldReturnAllMessages() throws Exception {
-        MessageResponseDTO m1 = new MessageResponseDTO(1L, "S1", "T1", LocalDateTime.now());
-        MessageResponseDTO m2 = new MessageResponseDTO(2L, "S2", "T2", LocalDateTime.now());
+        MessageResponseDTO m1 = new MessageResponseDTO(1L, "S1", LocalDateTime.now());
+        MessageResponseDTO m2 = new MessageResponseDTO(2L, "S2", LocalDateTime.now());
 
         when(messageService.findAll()).thenReturn(Arrays.asList(m1, m2));
 
@@ -53,7 +53,7 @@ public class MessageControllerTest {
         request.setSubject("Valid subject");
         request.setText("Some text");
 
-        MessageResponseDTO response = new MessageResponseDTO(1L, "Valid subject", "Some text", LocalDateTime.now());
+        MessageResponseDTO response = new MessageResponseDTO(1L, "Valid subject", LocalDateTime.now());
         when(messageService.create(any(MessageRequestDTO.class))).thenReturn(response);
 
         // When & Then
@@ -62,8 +62,7 @@ public class MessageControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.subject").value("Valid subject"))
-                .andExpect(jsonPath("$.text").value("Some text"));
+                .andExpect(jsonPath("$.subject").value("Valid subject"));
     }
 
     @Test

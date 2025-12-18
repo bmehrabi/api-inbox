@@ -12,6 +12,5 @@ import java.time.LocalDateTime;
 public class MessageResponseDTO {
     private Long id;
     private String subject;
-    private String text;
     private LocalDateTime createdDate;
 }

@@ -31,7 +31,6 @@ public class MessageService {
         return new MessageResponseDTO(
                 message.getId(),
                 message.getSubject(),
-                message.getText(),
                 message.getCreatedDate()
         );
     }
